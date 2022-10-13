@@ -5,6 +5,7 @@ library(ComplexHeatmap)
 library(circlize)
 library(RColorBrewer)
 library(ggplot2)
+# Converting seurat object to monocle object
 sce_merge <- readRDS('/subset_for_CNV.RDS')
 sce_merge <- subset(sce_merge, subset = celltype%in%c('ES_Ori',"ES_Stem","ES_NSC",'ES_Oligo','ES_Schw',"ES_NC",'ES_FB','ES_Musc'))
 DefaultAssay(sce_merge) <- 'RNA'
@@ -24,9 +25,12 @@ cds <- reduce_dimension(cds, reduction_method = 'UMAP',
 plot_cells(cds, label_groups_by_cluster=FALSE,  color_cells_by = "celltype") +
   scale_color_manual(values=c('#023FA5','#7D87B9','#E07B91','#D33F6A','#8DD593',
                               '#C6DEC7','#EAD3C6','#F0B98D'))
+# Clustering
 cds <- cluster_cells(cds)
 plot_cells(cds, label_groups_by_cluster=FALSE,  color_cells_by = "partition")
+# Building trajectoriy
 cds <- learn_graph(cds)
+# Identifying pseudotime
 cds <- order_cells(cds)
 plot_cells(cds,
            color_cells_by = "pseudotime",
