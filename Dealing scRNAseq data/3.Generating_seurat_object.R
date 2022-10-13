@@ -4,43 +4,43 @@ library(patchwork, quietly = T)
 library(dplyr, quietly = T)
 library(ggplot2)
 # Reading in data and creating merged seurat object
-sc_Ts11_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-C/outs/filtered_feature_bc_matrix/")
+sc_Ts11_C <- Mo_datain("/sc_Ts11-C/outs/filtered_feature_bc_matrix/")
 sc_Ts11_C$ID <- 'sc_Ts11-C'
-sc_Ts11_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-M/outs/filtered_feature_bc_matrix/")
+sc_Ts11_M <- Mo_datain("/sc_Ts11-M/outs/filtered_feature_bc_matrix/")
 sc_Ts11_M$ID <- 'sc_Ts11-M'
-sc_Ts11_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-P/outs/filtered_feature_bc_matrix/")
+sc_Ts11_P <- Mo_datain("/sc_Ts11-P/outs/filtered_feature_bc_matrix/")
 sc_Ts11_P$ID <- 'sc_Ts11-P'
-sc_Ts15_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts15-C/outs/filtered_feature_bc_matrix/")
+sc_Ts15_C <- Mo_datain("/sc_Ts15-C/outs/filtered_feature_bc_matrix/")
 sc_Ts15_C$ID <- 'sc_Ts15-C'
-sc_Ts15_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts15-P/outs/filtered_feature_bc_matrix/")
+sc_Ts15_P <- Mo_datain("/sc_Ts15-P/outs/filtered_feature_bc_matrix/")
 sc_Ts15_P$ID <- 'sc_Ts15-P'
-sc_Ts6_4_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-4-M/outs/filtered_feature_bc_matrix/")
+sc_Ts6_4_M <- Mo_datain("/sc_Ts6-4-M/outs/filtered_feature_bc_matrix/")
 sc_Ts6_4_M$ID <- 'sc_Ts6-4-M'
-sc_Ts6_4_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-4-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_4_P <- Mo_datain("/sc_Ts6-4-P/outs/filtered_feature_bc_matrix/")
 sc_Ts6_4_P$ID <- 'sc_Ts6-4-P'
-sc_Ts6_8_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6_8-M/outs/filtered_feature_bc_matrix/")
+sc_Ts6_8_M <- Mo_datain("/sc_Ts6_8-M/outs/filtered_feature_bc_matrix/")
 sc_Ts6_8_M$ID <- 'sc_Ts6_8-M'
-sc_Ts6_8_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-8-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_8_P <- Mo_datain("/sc_Ts6-8-P/outs/filtered_feature_bc_matrix/")
 sc_Ts6_8_P$ID <- 'sc_Ts6-8-P'
-sc_Ts6_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-C/outs/filtered_feature_bc_matrix/")
+sc_Ts6_C <- Mo_datain("/sc_Ts6-C/outs/filtered_feature_bc_matrix/")
 sc_Ts6_C$ID <- 'sc_Ts6-C'
-sc_Ts6_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_P <- Mo_datain("/sc_Ts6-P/outs/filtered_feature_bc_matrix/")
 sc_Ts6_P$ID <- 'sc_Ts6-P'
-sc_Ts8_15_M1 <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8_15-M1/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_M1 <- Mo_datain("/sc_Ts8_15-M1/outs/filtered_feature_bc_matrix/")
 sc_Ts8_15_M1$ID <- 'sc_Ts8_15-M1'
-sc_Ts8_15_M2 <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8_15-M2/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_M2 <- Mo_datain("/sc_Ts8_15-M2/outs/filtered_feature_bc_matrix/")
 sc_Ts8_15_M2$ID <- 'sc_Ts8_15-M2'
-sc_Ts8_15_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-15-P/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_P <- Mo_datain("/sc_Ts8-15-P/outs/filtered_feature_bc_matrix/")
 sc_Ts8_15_P$ID <- 'sc_Ts8-15-P'
-sc_Ts8_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-C/outs/filtered_feature_bc_matrix/")
+sc_Ts8_C <- Mo_datain("/sc_Ts8-C/outs/filtered_feature_bc_matrix/")
 sc_Ts8_C$ID <- 'sc_Ts8-C'
-sc_Ts8_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-M/outs/filtered_feature_bc_matrix/")
+sc_Ts8_M <- Mo_datain("/sc_Ts8-M/outs/filtered_feature_bc_matrix/")
 sc_Ts8_M$ID <- 'sc_Ts8-M'
-sc_Ts8_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-P/outs/filtered_feature_bc_matrix/")
+sc_Ts8_P <- Mo_datain("/sc_Ts8-P/outs/filtered_feature_bc_matrix/")
 sc_Ts8_P$ID <- 'sc_Ts8-P'
-sc_WT_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_WT-C/outs/filtered_feature_bc_matrix/")
+sc_WT_C <- Mo_datain("/sc_WT-C/outs/filtered_feature_bc_matrix/")
 sc_WT_C$ID <- 'sc_WT-C'
-sc_WT_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_WT-P/outs/filtered_feature_bc_matrix/")
+sc_WT_P <- Mo_datain("/sc_WT-P/outs/filtered_feature_bc_matrix/")
 sc_WT_P$ID <- 'sc_WT-P'
 
 sce_merge <- merge(sc_Ts11_C, c(sc_Ts11_M, 
