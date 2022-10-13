@@ -1,93 +1,100 @@
-library(Seurat)
-library(reshape2)
-library(future, quietly = T)
-plan("multiprocess", workers = 8)
-options(future.globals.maxSize = 15000 * 1024^2)
-##For mouse
-Mo_datain <- function(dic = "", mito = "^mt-"){
-  pbmc.counts <- Read10X(data.dir = dic)
-  pbmc <- CreateSeuratObject(counts = pbmc.counts)
-  pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = mito)
-  library(scater)
-  qc.lib2 <- isOutlier(pbmc$nCount_RNA, log=TRUE, type="lower")
-  print("nCount_RNA")
-  print(attr(qc.lib2, "thresholds"))
-  qc.nexprs2 <- isOutlier(pbmc$nFeature_RNA, log=TRUE, type="lower")
-  print("nFeature_RNA")
-  print(attr(qc.nexprs2, "thresholds"))
-  qc.mito2 <- isOutlier(pbmc$percent.mt, type="higher")
-  print("percent.mt")
-  print(attr(qc.mito2, "thresholds"))
-  return(pbmc)
-}
-set_celltype <- function(sce, new.cluster.ids = c(1,2)){
-  names(new.cluster.ids) <- levels(sce)
-  sce <- RenameIdents(sce, new.cluster.ids)
-  sce$celltype <- Idents(sce)
-  return(sce)
-}
-factor_order_change <- function(new_order, old_factor){
-  new_order <- factor(1:length(new_order),labels = new_order)
-  new_factor <- factor(old_factor,levels = levels(new_order))
-  return(new_factor)
-}
-# Initiate data
-Ts8_M <- Mo_datain("/201113C_Ts8_lung/filtered_feature_bc_matrix/")
-Ts8_M$ID <- 'Ts8-M'
+library(dplyr, quietly = T)
+library(Seurat, quietly = T)
+library(patchwork, quietly = T)
+library(dplyr, quietly = T)
+library(ggplot2)
+# Reading in data and creating merged seurat object
+sc_Ts11_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-C/outs/filtered_feature_bc_matrix/")
+sc_Ts11_C$ID <- 'sc_Ts11-C'
+sc_Ts11_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-M/outs/filtered_feature_bc_matrix/")
+sc_Ts11_M$ID <- 'sc_Ts11-M'
+sc_Ts11_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts11-P/outs/filtered_feature_bc_matrix/")
+sc_Ts11_P$ID <- 'sc_Ts11-P'
+sc_Ts15_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts15-C/outs/filtered_feature_bc_matrix/")
+sc_Ts15_C$ID <- 'sc_Ts15-C'
+sc_Ts15_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts15-P/outs/filtered_feature_bc_matrix/")
+sc_Ts15_P$ID <- 'sc_Ts15-P'
+sc_Ts6_4_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-4-M/outs/filtered_feature_bc_matrix/")
+sc_Ts6_4_M$ID <- 'sc_Ts6-4-M'
+sc_Ts6_4_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-4-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_4_P$ID <- 'sc_Ts6-4-P'
+sc_Ts6_8_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6_8-M/outs/filtered_feature_bc_matrix/")
+sc_Ts6_8_M$ID <- 'sc_Ts6_8-M'
+sc_Ts6_8_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-8-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_8_P$ID <- 'sc_Ts6-8-P'
+sc_Ts6_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-C/outs/filtered_feature_bc_matrix/")
+sc_Ts6_C$ID <- 'sc_Ts6-C'
+sc_Ts6_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts6-P/outs/filtered_feature_bc_matrix/")
+sc_Ts6_P$ID <- 'sc_Ts6-P'
+sc_Ts8_15_M1 <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8_15-M1/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_M1$ID <- 'sc_Ts8_15-M1'
+sc_Ts8_15_M2 <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8_15-M2/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_M2$ID <- 'sc_Ts8_15-M2'
+sc_Ts8_15_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-15-P/outs/filtered_feature_bc_matrix/")
+sc_Ts8_15_P$ID <- 'sc_Ts8-15-P'
+sc_Ts8_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-C/outs/filtered_feature_bc_matrix/")
+sc_Ts8_C$ID <- 'sc_Ts8-C'
+sc_Ts8_M <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-M/outs/filtered_feature_bc_matrix/")
+sc_Ts8_M$ID <- 'sc_Ts8-M'
+sc_Ts8_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_Ts8-P/outs/filtered_feature_bc_matrix/")
+sc_Ts8_P$ID <- 'sc_Ts8-P'
+sc_WT_C <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_WT-C/outs/filtered_feature_bc_matrix/")
+sc_WT_C$ID <- 'sc_WT-C'
+sc_WT_P <- Mo_datain("/share/home/xudeshu/scanpy_dic/heter/scRNA_out/sc_WT-P/outs/filtered_feature_bc_matrix/")
+sc_WT_P$ID <- 'sc_WT-P'
 
-Ts11_M <- Mo_datain("/201113B_TS11_lung/filtered_feature_bc_matrix/")
-Ts11_M$ID <- 'Ts11-M'
+sce_merge <- merge(sc_Ts11_C, c(sc_Ts11_M, 
+sc_Ts11_P, 
+sc_Ts15_C, 
+sc_Ts15_P, 
+sc_Ts6_4_M, 
+sc_Ts6_4_P, 
+sc_Ts6_8_M, 
+sc_Ts6_8_P, 
+sc_Ts6_C, 
+sc_Ts6_P, 
+sc_Ts8_15_M1, 
+sc_Ts8_15_M2, 
+sc_Ts8_15_P, 
+sc_Ts8_C, 
+sc_Ts8_M, 
+sc_Ts8_P, 
+sc_WT_C, 
+sc_WT_P ))
+VariableFeatures(sce_merge) <- c(VariableFeatures(sc_Ts11_C),VariableFeatures(sc_Ts11_M),VariableFeatures(sc_Ts11_P),
+                                VariableFeatures(sc_Ts15_C),VariableFeatures(sc_Ts15_P),VariableFeatures(sc_Ts6_4_M),VariableFeatures(sc_Ts6_4_P),
+                                VariableFeatures(sc_Ts6_8_M),VariableFeatures(sc_Ts6_8_P),VariableFeatures(sc_Ts6_C),VariableFeatures(sc_Ts6_P),
+                                VariableFeatures(sc_Ts8_15_M1),VariableFeatures(sc_Ts8_15_M2),VariableFeatures(sc_Ts8_15_P),VariableFeatures(sc_Ts8_C),
+                                VariableFeatures(sc_Ts8_M),VariableFeatures(sc_Ts8_P),VariableFeatures(sc_WT_C),VariableFeatures(sc_WT_P))
 
-Ts6_8_M <- Mo_datain("/201113C_Ts6_8_lung/filtered_feature_bc_matrix/")
-Ts6_8_M$ID <- 'Ts6_8-M'
+rm(sc_Ts11_C,
+   sc_Ts11_M, 
+sc_Ts11_P, 
+sc_Ts15_C, 
+sc_Ts15_P, 
+sc_Ts6_4_M, 
+sc_Ts6_4_P, 
+sc_Ts6_8_M, 
+sc_Ts6_8_P, 
+sc_Ts6_C, 
+sc_Ts6_P, 
+sc_Ts8_15_M1, 
+sc_Ts8_15_M2, 
+sc_Ts8_15_P, 
+sc_Ts8_C, 
+sc_Ts8_M, 
+sc_Ts8_P, 
+sc_WT_C, 
+sc_WT_P )
+Idents(sce_merge) <- sce_merge$ID
+sce_merge <- set_celltype(sce_merge, new.cluster.ids = c('C','M','P','C','P','M','P','M','P','C','P','M','M','P','C','M','P','C','P'))
+sce_merge$group1 <- sce_merge$celltype
+Idents(sce_merge) <- sce_merge$ID
+sce_merge <- set_celltype(sce_merge, new.cluster.ids = c('Ts11','Ts11','Ts11','Ts15','Ts15','Ts6','Ts6','Ts6+8','Ts6+8','Ts6','Ts6','Ts8+15',
+                                                         'Ts8+15','Ts8+15','Ts8','Ts8','Ts8','WT','WT'))
+sce_merge$group2 <- sce_merge$celltype
+sce_merge$group3 <- paste(sce_merge$group2, sce_merge$group1, sep = '_')
+sce_merge$group3 <- factor_order_change(c('WT_C','Ts6_C','Ts8_C','Ts11_C','Ts15_C','WT_P','Ts6_P','Ts8_P','Ts11_P','Ts15_P','Ts6+8_P','Ts8+15_P', 
+                                          'Ts6_M','Ts8_M', 'Ts11_M', 'Ts6+8_M', 'Ts8+15_M'), sce_merge$group3)
+sce_merge <- subset(sce_merge, subset = ID!= 'sc_Ts6-4-P') # Discarded because of poor quality
 
-Ts8_15_M1 <- Mo_datain("/191522A_Ts8_lung/filtered_feature_bc_matrix/")
-Ts8_15_M1$ID <- 'Ts8_15-M1'
-
-Ts8_15_M2 <- Mo_datain("/201113A_Ts15_lung/filtered_feature_bc_matrix/")
-Ts8_15_M2$ID <- 'Ts8_15-M2'
-
-total.list <- list(Ts8_M,Ts11_M,Ts6_8_M,Ts8_15_M1,Ts8_15_M2)
-samplelist <- c('Ts8_M','Ts11_M','Ts6_8_M','Ts8_15_M1','Ts8_15_M2')
-rm(Ts8_M,Ts11_M,Ts6_8_M,Ts8_15_M1,Ts8_15_M2)
-# Merge samples
-sce_merge <- merge(x =  total.list[[1]], y = c(total.list[[2]],total.list[[3]],total.list[[4]],total.list[[5]]), add.cell.ids=c(0,1,2,3,4))
-rm(total.list)
-sce_merge <- subset(sce_merge, subset = percent.mt<=25)
-sce_merge <- subset(sce_merge, subset = nFeature_RNA >200)
-# run sctransform
-sce_merge <- SCTransform(sce_merge, verbose = FALSE)
-# These are now standard steps in the Seurat workflow for visualization and clustering
-sce_merge <- RunPCA(sce_merge, verbose = FALSE)
-sce_merge <- RunUMAP(sce_merge, dims = 1:20, verbose = FALSE)
-sce_merge <- FindNeighbors(sce_merge, dims = 1:30, verbose = FALSE)
-sce_merge <- FindClusters(sce_merge, verbose = FALSE, resolution = 0.5)
-DimPlot(sce_merge)
-VlnPlot(sce_merge, features = c('Luciferin','GFP','Mki67'))
-total_marker <- c('Ptprc','Ly6g','Csf3r','Tlr4','Siglece','Cd14','Fcgr3','Itgam','Fcgr1','Fcgr2b','Ly75','Mertk','Nkg7','Klrc1','Klrb1c','Cd3e','Cd3d','Cd9','Itga2b','Alas2','Gypa','Pecam1','Hes1','Col3a1',
-                  'Col1a1','Epcam','Sox2','Sdc1','Dppa5a','Zfp42','Nes','Msi1','Gfap','Sox9','Tubb3','Dcx','Map2','Hif1a','Mapkapk5','Hspb1')
-DotPlot(sce_merge, features = total_marker) + RotatedAxis()
-Idents(sce_merge) <- sce_merge$seurat_clusters
-# Annotating clusters
-sce_merge <- set_celltype(sce_merge, new.cluster.ids = c('Granulocyte','Granulocyte','DC',"Macrophage","AC_NC","AC_NSC",'AC_FB','AC',"Erythroid",'Granulocyte',"Endothelium","Erythroid","Macrophage",'AC',"T_ILC","AC_Schw","Macrophage",'AC_Epi',"Erythroid","Fibroblast",'Granulocyte','AC',"T_ILC","Epithelium","Epithelium",'AC_Epi','Granulocyte','Granulocyte',"Fibroblast",'DC',"Erythroid",'Granulocyte'))
-sce_merge$celltype <- factor_order_change(c('Granulocyte',"Macrophage","DC","T_ILC","Erythroid","Endothelium",
-                                            "Fibroblast","Epithelium",'AC_Epi',"AC","AC_NSC",'AC_Schw',"AC_NC","AC_FB"), sce_merge$celltype)
-Idents(sce_merge) <- sce_merge$celltype
-DimPlot(sce_merge, label = T)
-DimPlot(sce_merge, cols = c("#023FA5","#7D87B9","#BEC1D4","#D6BCC0","#BB7784","#8E063B","#4A6FE3","#8595E1","#B5BBE3","#E6AFB9",
-                            "#E07B91","#D33F6A","#11C638","#8DD593"), pt.size = 1.5)
-DimPlot(sce_merge, cols = c("#4A6FE3","#8595E1","#B5BBE3","#E6AFB9",
-                            "#E07B91","#D33F6A","#11C638","#8DD593","#023FA5","#7D87B9","#BEC1D4","#D6BCC0","#BB7784","#8E063B"), pt.size = 1.5)
-sce_merge <- saveRDS(sce_merge,'E:/heteroploidy/single_cell/total_merge3.RDS')
-# Visulizing targeted genes
-FeaturePlot(sce_merge, features = 'GFP', pt.size = 4, order = T, cols = featureplot4, raster = T)
-FeaturePlot(sce_merge, features = 'Luciferin', pt.size = 4, order = T, cols = featureplot4, raster = T)
-FeaturePlot(sce_merge, features = 'Nanog', pt.size = 4, order = T, cols = featureplot4, raster = T)
-FeaturePlot(sce_merge, features = c('Tfec','Habp2','Dkk1','Cubn','Pramel6'), pt.size = 4, order = T, cols = featureplot4, raster = T, label = T)
-# Prepare for cell distribution
-temp1 <- rownames(sce_merge@meta.data)
-temp2 <- substring(temp1, 1,1)
-temp3 <- substring(temp1, 3,20)
-sce_merge$barcode <- paste(temp3, temp2, sep = '-')
-write.csv(sce_merge@meta.data[,c('celltype','barcode','ID')],'meta_data.csv', row.names = F, quote = F)
-sce_merge <- saveRDS(sce_merge,'/single_cell/total_merge.RDS')
