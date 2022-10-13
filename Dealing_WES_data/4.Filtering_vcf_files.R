@@ -36,7 +36,7 @@ for (i in tumor_list) {
   temp1 <- temp1[temp1$V7=='PASS',]
   print(i)
   print(dim(temp1)[1]) 
-  write.table(temp1, paste0("E:./temp_data/",i,"_filtered.vcf"), sep = '\t', row.names = F, quote = F, col.names = F)
+  write.table(temp1, paste0("./filtered_vcf/",i,"_filtered.vcf"), sep = '\t', row.names = F, quote = F, col.names = F)
   ident <- paste(temp1$V1,temp1$V2,temp1$V4,temp1$V5,sep = '_')
   ident1 <- c(ident1, ident)
 }
