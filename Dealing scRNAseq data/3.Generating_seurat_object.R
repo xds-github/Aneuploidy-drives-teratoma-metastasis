@@ -97,4 +97,75 @@ sce_merge$group3 <- paste(sce_merge$group2, sce_merge$group1, sep = '_')
 sce_merge$group3 <- factor_order_change(c('WT_C','Ts6_C','Ts8_C','Ts11_C','Ts15_C','WT_P','Ts6_P','Ts8_P','Ts11_P','Ts15_P','Ts6+8_P','Ts8+15_P', 
                                           'Ts6_M','Ts8_M', 'Ts11_M', 'Ts6+8_M', 'Ts8+15_M'), sce_merge$group3)
 sce_merge <- subset(sce_merge, subset = ID!= 'sc_Ts6-4-P') # Discarded because of poor quality
+#  Dimensionality reduction and cell annotation
+sce_merge <- RunPCA(sce_merge, verbose = FALSE)
+sce_merge <- FindNeighbors(sce_merge, dims = 1:30)
+sce_merge <- RunUMAP(sce_merge, dims = 1:30, min.dist = 0.2, spread = 1)
+sce_merge <- FindClusters(sce_merge, verbose = FALSE)
+Idents(sce_merge) <- sce_merge$seurat_clusters
+options(repr.plot.width=20, repr.plot.height=12)
+total_marker <- c('Ptprc','Ly6g','Csf3r','Tlr4','Siglece','Cd14','Fcgr3','Itgam','Fcgr1','Ly75','Mertk','Nkg7',
+                  'Klrc1','Klrb1c','Cd3e','Cd3d','Cd9','Alas2','Gypa','Pecam1','Hes1','Col3a1',
+                  'Col1a1','Sdc1','Epcam','Hsp90aa1','Sox2','Npm1','Dppa5a','Zfp42','Pou5f1','Trh','Des','Tnnc2','Myl1','Sox17','Nes','Msi1','Olig1','Gfap','Sox9','Tubb3','Dcx',
+                  'Map2')
+DotPlot(sce_merge, features = total_marker) + RotatedAxis()
+Idents(sce_merge) <- sce_merge$seurat_clusters
+sce_merge <- set_celltype(sce_merge, new.cluster.ids = c('ES_Ori','ES_Ori','Macrophage','Granulocyte','ES_NSC','ES_NC','ES_Schw','ES_FB','ES_NC','ES_NSC',
+                                                         'ES_Ori','ES_FB','ES_NC','ES_NSC',
+                                                         'Granulocyte','ES_Stem','ES_Stem','ES_Ori','Macrophage',
+                                                         'Granulocyte','Epithelium','ES_Schw','DC','Endothelium','Erythroid','ES_NC','ES_Oligo','DC',
+                                                         'Erythroid','Granulocyte','Endothelium','T&ILC','ES_Ori','ES_FB','ES_Stem','Macrophage',
+                                                         'T&ILC','Fibroblast','Erythroid','ES_Musc','DC','Fibroblast','ES_Schw','Granulocyte','ES_Ori',
+                                                         'Macrophage','ES_FB'))
 
+sce_merge$celltype <- factor_order_change(c('Granulocyte',"Macrophage","DC","T&ILC","Erythroid","Endothelium","Fibroblast","Epithelium",'ES_Ori',"ES_Stem","ES_NSC",'ES_Oligo','ES_Schw',"ES_NC",'ES_FB','ES_Musc'), sce_merge$celltype)
+Idents(sce_merge) <- sce_merge$celltype
+# Visulizing marker genes
+options(repr.plot.width=18, repr.plot.height=6)
+total_marker <- c('Ptprc','Ly6g','Csf3r','Tlr4','Siglece','Cd14','Fcgr3','Itgam','Fcgr1','Ly75','Mertk','Nkg7',
+                  'Klrc1','Klrb1c','Cd3e','Cd3d','Cd9','Alas2','Gypa','Pecam1','Hes1','Col3a1',
+                  'Col1a1','Sdc1','Epcam','Hsp90aa1','Sox2','Npm1','Dppa5a','Zfp42','Pou5f1','Trh','Sox17','Nes','Msi1','Olig1','Gfap','Sox9','Tubb3',
+                  'Dcx','Map2','Des','Tnnc2','Myl1')
+
+DotPlot(sce_merge, features = total_marker, cols = 'RdBu') + RotatedAxis()
+
+ggsave("/total_marker.pdf", width = 18, height = 6)
+# Perpare object for inferCNV
+sce_merge_temp <- subset(sce_merge, subset = celltype%in%c('ES_Ori',"ES_Stem","ES_NSC",'ES_Oligo','ES_Schw',"ES_NC",'ES_FB','ES_Musc'))
+# Down sample the metadata
+target_mata <- sce_merge_temp@meta.data
+filter_meta <- data.frame()
+celltype <- unique(target_mata$group3)
+
+target_mata$X <- rownames(target_mata)
+
+for (i in celltype) {
+    temp <- target_mata[target_mata$group3==i,]
+    if (dim(temp)[1]>1500) {
+        temp1 <- sample(temp$X, 1500)
+        temp2 <- temp[temp$X%in%temp1,]
+        filter_meta <- rbind(filter_meta, temp2)
+    } else {
+        filter_meta <- rbind(filter_meta, temp)
+    }
+    }
+
+target_mata <- sce_merge@meta.data
+target_mata$X <- rownames(target_mata)
+
+celltype <- c('Granulocyte',"Macrophage","DC","T&ILC","Erythroid","Endothelium","Fibroblast","Epithelium")
+
+for (i in celltype) {
+    temp <- target_mata[target_mata$celltype==i,]
+    if (dim(temp)[1]>1200) {
+        temp1 <- sample(temp$X, 1200)
+        temp2 <- temp[temp$X%in%temp1,]
+        filter_meta <- rbind(filter_meta, temp2)
+    } else {
+        filter_meta <- rbind(filter_meta, temp)
+    }
+    }
+
+sce_merge_temp <- sce_merge[,filter_meta$X]
+DefaultAssay(sce_merge_temp) <- 'SCT'
+saveRDS(sce_merge_temp,'subset_for_CNV.RDS')
