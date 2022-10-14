@@ -3,6 +3,33 @@ library(Seurat, quietly = T)
 library(patchwork, quietly = T)
 library(dplyr, quietly = T)
 library(ggplot2)
+Mo_datain <- function(dic = "", mito = "^mt-"){
+  pbmc.counts <- Read10X(data.dir = dic)
+  pbmc <- CreateSeuratObject(counts = pbmc.counts)
+  pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = mito)
+  library(scater)
+  qc.lib2 <- isOutlier(pbmc$nCount_RNA, log=TRUE, type="lower")
+  print("nCount_RNA")
+  print(attr(qc.lib2, "thresholds"))
+  qc.nexprs2 <- isOutlier(pbmc$nFeature_RNA, log=TRUE, type="lower")
+  print("nFeature_RNA")
+  print(attr(qc.nexprs2, "thresholds"))
+  qc.mito2 <- isOutlier(pbmc$percent.mt, type="higher")
+  print("percent.mt")
+  print(attr(qc.mito2, "thresholds"))
+  return(pbmc)
+}
+set_celltype <- function(sce, new.cluster.ids = c(1,2)){
+  names(new.cluster.ids) <- levels(sce)
+  sce <- RenameIdents(sce, new.cluster.ids)
+  sce$celltype <- Idents(sce)
+  return(sce)
+}
+factor_order_change <- function(new_order, old_factor){
+  new_order <- factor(1:length(new_order),labels = new_order)
+  new_factor <- factor(old_factor,levels = levels(new_order))
+  return(new_factor)
+}
 # Reading in data and creating merged seurat object
 sc_Ts11_C <- Mo_datain("/sc_Ts11-C/outs/filtered_feature_bc_matrix/")
 sc_Ts11_C$ID <- 'sc_Ts11-C'
