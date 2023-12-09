@@ -34,7 +34,7 @@ human_syb2mus_syb <- function(gene_list){
   return(out_list$`Mouse gene name`)
 }
 # ----------------------- Read in matrix -----------------------------------
-meta_data <- read.csv('sample_info_230816.csv',check.names = F)
+meta_data <- read.csv('Bulk_RNA_sample_info_230816.csv',check.names = F)
 meta_data$group2 <- paste(meta_data$chr, meta_data$day, sep = '_')
 sample_N <- meta_data$sampleName
 count_matrix <- read.table(paste0('BRNA_Ts11-EB-D8-1','_ReadsPerGene.txt'),check.names = F)
