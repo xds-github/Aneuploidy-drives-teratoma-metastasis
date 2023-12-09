@@ -1,5 +1,5 @@
 # Aneuploidy-drives-teratoma-metastasis
-Code for Aneuploidy drives teratoma metastasis
+The codes for the "aneuploidy drives teratoma metastasis" project. 
 The following package are needed:
 fastp (version: 0.20.0)
 bwa (version: 0.7.17-r1188)
